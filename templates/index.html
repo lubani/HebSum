@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Summarization</title>
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+            font-family: Arial, sans-serif;
+        }
+        textarea, input {
+            font-size: 16px;
+        }
+        #summary {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>סיכום טקסט בעברית</h1>
+    <form id="summarizeForm">
+        <label for="text">הכנס טקסט:</label><br><br>
+        <textarea id="text" name="text" rows="10" cols="50"></textarea><br><br>
+        <input type="button" value="סכם" onclick="summarizeText()">
+    </form>
+    <h2>הסיכום:</h2>
+    <p id="summary"></p>
+
+    <script>
+        function summarizeText() {
+            const text = document.getElementById("text").value;
+
+            fetch("/summarize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("summary").innerText = data.summary;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
