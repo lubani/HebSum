@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <title>Hebrew Summarizer</title>
+    <style>
+        body {
+            direction: rtl;
+            font-family: Arial, sans-serif;
+        }
+        textarea, input {
+            font-size: 16px;
+        }
+        #summaryOutput {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>סיכום טקסט בעברית</h1>
+    <textarea id="textInput" rows="10" cols="50" placeholder="הכנס טקסט לסיכום כאן..."></textarea><br>
+    <input type="button" id="summarizeButton" value="סכם">
+    <div id="summaryOutput"></div>
+    <script src="popup.js"></script>
+</body>
+</html>

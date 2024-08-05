@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify, render_template
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-
+import re
 app = Flask(__name__)
 
 # Load the Hebrew-Mistral-7B model and tokenizer with 4-bit quantization
 model_id = "yam-peleg/Hebrew-Mistral-7B"
 quantization_config = BitsAndBytesConfig(
     load_in_4bit=True,
-    bnb_4bit_compute_dtype="float16"  # Corrected dtype
+    bnb_4bit_compute_dtype="float16"
 )
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -41,11 +41,29 @@ def summarize():
         do_sample=True,
         eos_token_id=tokenizer.eos_token_id,
     )
-    summary = tokenizer.decode(output[0], skip_special_tokens=True)
+    generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
 
-    # Ensure the summary does not include the input text
-    if text in summary:
-        summary = summary.replace(text, '').strip()
+    # Split the generated text and input text into sentences
+    generated_sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', generated_text)
+    input_sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
+
+    # Remove sentences that are too similar to those in the input
+    filtered_sentences = []
+    for sentence in generated_sentences:
+        stripped_sentence = sentence.strip()
+        if not any(re.search(re.escape(stripped_sentence), input_sent) for input_sent in input_sentences) and stripped_sentence:
+            filtered_sentences.append(stripped_sentence)
+
+    # Join the filtered sentences to form the final summary
+    summary = '. '.join(filtered_sentences).strip()
+
+    # Ensure the summary ends properly
+    if summary and summary[-1] not in '.!?':
+        summary += '.'
+
+    # Check if the summary is too similar to the input or empty
+    if not summary or len(set(filtered_sentences)) == 0:
+        summary = "לא ניתן ליצור סיכום קצר עבור הטקסט הזה."
 
     return jsonify(summary=summary)
 

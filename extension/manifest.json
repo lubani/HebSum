@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Hebrew Summarizer",
+  "version": "1.0",
+  "description": "Summarizes Hebrew text",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/icon.png"],
+      "matches": ["*://*/*"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
